@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verstappen Live Tracker</title>
+</head>
+<body>
+    <h1>Verstappen Live Tracker</h1>
+    <p>Current speed: <span id="speedDisplay">Loading...</span> km/h</p>
+    <script src="script.js"></script>
+    <script>
+        // Update the speed display
+        function updateSpeed(speed) {
+            document.getElementById('speedDisplay').textContent = speed;
+        }
+        // Call fetchData initially
+        fetchData();
+
+        setInterval(fetchData, 500);
+    </script>
+</body>
+</html>
