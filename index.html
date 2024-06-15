@@ -8,16 +8,47 @@
 <body>
     <h1>Verstappen Live Tracker</h1>
     <p>Current speed: <span id="speedDisplay">Loading...</span> km/h</p>
+    <p>Current interval: <span id="intervalDisplay">Loading...</span> s</p>
+    <p>Last lap: <span id="lapDisplay">Loading...</span> s</p>
+    <p>Lap Delta: <span id="lapDeltaDisplay">Loading...</span> s</p>
+
     <script src="script.js"></script>
     <script>
         // Update the speed display
         function updateSpeed(speed) {
             document.getElementById('speedDisplay').textContent = speed;
         }
+        // Update the interval display
+        function updateInterval(interval) {
+            document.getElementById('intervalDisplay').textContent = interval;
+        }
+        // Update the interval display
+        let previousLap = null;
+        function updateLap(lap) {
+            document.getElementById('lapDisplay').textContent = lap;
+            if (previousLap != null) {
+                const lapDelta = lap - previousLap;
+                updateLapDelta(lapDelta);
+            }
+            previousLap = lap;
+        }
+        // Update the lapdelta display
+        function updateLapDelta(lapDelta) {
+            document.getElementById('lapDeltaDisplay').textContent = lapDelta;
+        }
+
         // Call fetchData initially
         fetchData();
 
+        //call fetchInterval initially
+        fetchInterval();
+
+        //call fetchLap initially
+        fetchLap();
+
         setInterval(fetchData, 1500);
+        setInterval(fetchInterval, 1500);
+        setInterval(fetchLap, 1500);
     </script>
 </body>
 </html>
