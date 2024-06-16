@@ -11,7 +11,12 @@
     <p>Current interval: <span id="intervalDisplay">Loading...</span> s</p>
     <p>Last lap: <span id="lapDisplay">Loading...</span> s</p>
     <p>Lap Delta: <span id="lapDeltaDisplay">Loading...</span> s</p>
-
+    <p>Sector 1: <span id="sector1Display">Loading...</span> s</p>
+    <p>Sector 2: <span id="sector2Display">Loading...</span> s</p>
+    <p>Sector 3: <span id="sector3Display">Loading...</span> s</p>
+    <p>Sector 1 Delta: <span id="sector1DeltaDisplay">Loading...</span> s</p>
+    <p>Sector 2 Delta: <span id="sector2DeltaDisplay">Loading...</span> s</p>
+    <p>Sector 3 Delta: <span id="sector3DeltaDisplay">Loading...</span> s</p>
     <script src="script.js"></script>
     <script>
         // Update the speed display
@@ -35,6 +40,45 @@
         // Update the lapdelta display
         function updateLapDelta(lapDelta) {
             document.getElementById('lapDeltaDisplay').textContent = lapDelta;
+        }
+        // Update the sector displays
+        let previousSector1 = null;
+        function updateSector1(sector1) {
+            document.getElementById('sector1Display').textContent = sector1;
+            if (previousSector1 != null) {
+                const sector1Delta = sector1 - previousSector1;
+                updateSector1Delta(sector1Delta);
+            }
+            previousSector1 = sector1;
+        }
+        let previousSector2 = null;
+        function updateSector2(sector2) {
+            document.getElementById('sector2Display').textContent = sector2;
+            if (previousSector2 != null) {
+                const sector2Delta = sector2 - previousSector2;
+                updateSector2Delta(sector2Delta);
+            }
+            previousSector2 = sector2;
+        }
+        let previousSector3 = null;
+        function updateSector3(sector3) {
+            document.getElementById('sector3Display').textContent = sector3;
+            if (previousSector3 != null) {
+                const sector3Delta = sector3 - previousSector3;
+                updateSector3Delta(sector3Delta);
+            }
+            previousSector3 = sector3;
+        }
+
+            // Update the sector delta displays
+        function updateSector1Delta(sector1Delta) {
+            document.getElementById('sector1DeltaDisplay').textContent = sector1Delta;
+        }
+        function updateSector2Delta(sector2Delta) {
+            document.getElementById('sector2DeltaDisplay').textContent = sector2Delta;
+        }
+        function updateSector3Delta(sector3Delta) {
+            document.getElementById('sector3DeltaDisplay').textContent = sector3Delta;
         }
 
         // Call fetchData initially

@@ -81,12 +81,30 @@ function fetchLap() {
         })
         .then(data => {
             const lap = data[0].lap_duration;
-            // Überprüfen Sie, ob die Geschwindigkeit nicht null oder undefiniert ist, bevor Sie die Anzeige aktualisieren
+            const sector1 = data[0].duration_sector_1;
+            const sector2 = data[0].duration_sector_2;
+            const sector3 = data[0].duration_sector_3;
+
             if (lap != null) {
-                console.log(`Lap: ${lap} min`);
+                console.log(`Lap: ${lap} s`);
                 updateLap(lap);
             }
-            // Aktualisieren Sie lastQueryTime mit dem neuesten Datum aus den Daten
+
+            if (sector1 != null) {
+                console.log(`Sector 1: ${sector1} s`);
+                updateSector1(sector1);
+            }
+
+            if (sector2 != null) {
+                console.log(`Sector 2: ${sector2} s`);
+                updateSector2(sector2);
+            }
+
+            if (sector3 != null) {
+                console.log(`Sector 3: ${sector3} s`);
+                updateSector3(sector3);
+            }
+
             lastQueryTime = new Date(data[0].date_start);
         })
         .catch(error => {
