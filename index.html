@@ -17,6 +17,10 @@
     <p>Sector 1 Delta: <span id="sector1DeltaDisplay">Loading...</span> s</p>
     <p>Sector 2 Delta: <span id="sector2DeltaDisplay">Loading...</span> s</p>
     <p>Sector 3 Delta: <span id="sector3DeltaDisplay">Loading...</span> s</p>
+    <p>FIA Flag: <span id="flagDisplay">Loading...</span></p>
+    <p>FIA Message: <span id="messageDisplay">Loading...</span></p>
+    <p>Radio:</p>
+    <audio id="radioPlayer" controls></audio>
     <script src="script.js"></script>
     <script>
         // Update the speed display
@@ -39,7 +43,7 @@
         }
         // Update the lapdelta display
         function updateLapDelta(lapDelta) {
-            document.getElementById('lapDeltaDisplay').textContent = lapDelta;
+            document.getElementById('lapDeltaDisplay').textContent = parseFloat(lapDelta).toFixed(3);
         }
         // Update the sector displays
         let previousSector1 = null;
@@ -70,18 +74,32 @@
             previousSector3 = sector3;
         }
 
-            // Update the sector delta displays
+        // Update the sector delta displays
         function updateSector1Delta(sector1Delta) {
-            document.getElementById('sector1DeltaDisplay').textContent = sector1Delta;
+            document.getElementById('sector1DeltaDisplay').textContent = parseFloat(sector1Delta).toFixed(3);
         }
         function updateSector2Delta(sector2Delta) {
-            document.getElementById('sector2DeltaDisplay').textContent = sector2Delta;
+            document.getElementById('sector2DeltaDisplay').textContent = parseFloat(sector2Delta).toFixed(3);
         }
         function updateSector3Delta(sector3Delta) {
-            document.getElementById('sector3DeltaDisplay').textContent = sector3Delta;
+            document.getElementById('sector3DeltaDisplay').textContent = parseFloat(sector3Delta).toFixed(3);
         }
 
-        // Call fetchData initially
+        // Update the race control display
+        function updateFlag(flag) {
+            document.getElementById('flagDisplay').textContent = flag;
+        }
+        function updateMessage(message) {
+            document.getElementById('messageDisplay').textContent = message;
+        }
+        //Update the radio display
+        function updateRadio(recording_url) {
+            const player = document.getElementById('radioPlayer');
+            player.src = recording_url;
+            player.play();
+        }
+
+        //call fetchData initially
         fetchData();
 
         //call fetchInterval initially
@@ -90,9 +108,17 @@
         //call fetchLap initially
         fetchLap();
 
+        //call fetchRaceControl initially
+        fetchRaceControl();
+
+        //call fetchRadio initially
+        fetchRadio();
+
         setInterval(fetchData, 1500);
         setInterval(fetchInterval, 1500);
         setInterval(fetchLap, 1500);
+        setInterval(fetchRaceControl, 1500);
+        setInterval(fetchRadio, 1500);
     </script>
 </body>
 </html>

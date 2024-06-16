@@ -9,8 +9,13 @@ const apiUrlInterval = 'https://api.openf1.org/v1/intervals?session_key=latest&d
 //Ersetzen Sie die URL durch Ihren tatsächlichen API-Endpunkt
 const apiUrlLapDuration = 'https://api.openf1.org/v1/laps?session_key=latest&driver_number=1&date_start>'; //LIVE
 
+const apiUrlRaceControl = 'https://api.openf1.org/v1/race_control?session_key=latest&driver_number=1&date>'; //LIVE
+
+//const apiUrlRadio = 'https://api.openf1.org/v1/team_radio?session_key=9158&driver_number=11&date>'; //TEST
+const apiUrlRadio = 'https://api.openf1.org/v1/team_radio?session_key=latest&driver_number=1&date>'; //LIVE
+
 //Ersätzen Sie die URL durch Ihren tatsächlichen API-Endpunkt
-//let lastQueryTime = new Date('2023-09-16T13:03:04.650000+00:00'); // Startzeitpunkt TEST
+//let lastQueryTime = new Date('2023-09-15T09:40:43.005000+00:00'); // Startzeitpunkt TEST
 let lastQueryTime = new Date(); // Setzt lastQueryTime auf die aktuelle Zeit LIVE
 
 function fetchData() {
@@ -106,6 +111,68 @@ function fetchLap() {
             }
 
             lastQueryTime = new Date(data[0].date_start);
+        })
+        .catch(error => {
+            console.error('Fehler beim Abrufen der Daten:', error);
+        });
+}
+
+function fetchRaceControl() {
+    // Formatieren Sie das Datum in ISO 8601 Format und fügen Sie es zur URL hinzu
+    const url = `${apiUrlRaceControl}${lastQueryTime.toISOString()}Z`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Keine Daten für diesen Zeitstempel gefunden');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const flag = data[0].flag;
+            const message = data[0].message;
+
+            if (flag != null) {
+                console.log(`Flag: ${flag}`);
+                updateFlag(flag);
+            } else {
+                updateFlag('none');
+            }
+
+            if (message != null) {
+                console.log(`Message: ${message}`);
+                updateMessage(message);
+            } else {
+                updateMessage('none');
+            }
+
+            lastQueryTime = new Date(data[0].date);
+        })
+        .catch(error => {
+            console.error('Fehler beim Abrufen der Daten:', error);
+        });
+}
+
+function fetchRadio() {
+    // Formatieren Sie das Datum in ISO 8601 Format und fügen Sie es zur URL hinzu
+    const url = `${apiUrlRadio}${lastQueryTime.toISOString()}Z`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Keine Daten für diesen Zeitstempel gefunden');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const recording_url = data[0].recording_url;
+
+            if (recording_url != null) {
+                console.log(`Radio: ${recording_url}`);
+                updateRadio(recording_url);
+            }
+
+            lastQueryTime = new Date(data[0].date);
         })
         .catch(error => {
             console.error('Fehler beim Abrufen der Daten:', error);
