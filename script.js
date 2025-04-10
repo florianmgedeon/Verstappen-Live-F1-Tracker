@@ -7,9 +7,7 @@ async function fetchAllData() {
             fetchGap(),
             fetchPosition(),
             fetchLapTimes(),
-            fetchTyres(),
-            fetchPitStop(),
-            fetchRadio()
+            fetchTyres()
         ]);
     } catch (err) {
         console.error('Error fetching F1 data:', err);
@@ -22,8 +20,14 @@ async function fetchGap() {
     const data = await res.json();
     if (data.length > 0) {
         const latest = data[data.length - 1];
-        document.getElementById('gapToLeader').textContent = latest.gap_to_leader?.toFixed(1) ?? 'N/A';
-        document.getElementById('intervalToAhead').textContent = latest.interval_to_car_ahead?.toFixed(1) ?? 'N/A';
+        const gap = latest.gap_to_leader === null ? 0 : latest.gap_to_leader;
+        const interval = latest.interval === null ? 0 : latest.interval;
+
+        document.getElementById('gapToLeader').textContent = gap.toFixed(1);
+        document.getElementById('intervalToAhead').textContent = interval.toFixed(1);
+    } else {
+        document.getElementById('gapToLeader').textContent = 'N/A';
+        document.getElementById('intervalToAhead').textContent = 'N/A';
     }
 }
 
@@ -60,36 +64,24 @@ async function fetchLapTimes() {
     }
 }
 
-
 // 4. Tyres / stints
 async function fetchTyres() {
-    const res = await fetch(`https://api.openf1.org/v1/stints?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
-    const data = await res.json();
-    if (data.length > 0) {
-        const latest = data[data.length - 1];
-        document.getElementById('tyreCompound').textContent = latest.compound || 'N/A';
-        document.getElementById('stintLength').textContent = latest.laps_completed || 'N/A';
-    }
-}
+    const resStints = await fetch(`https://api.openf1.org/v1/stints?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+    const stintData = await resStints.json();
+    const resLaps = await fetch(`https://api.openf1.org/v1/laps?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+    const lapData = await resLaps.json();
 
-// 5. Pit stops
-async function fetchPitStop() {
-    const res = await fetch(`https://api.openf1.org/v1/pit?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
-    const data = await res.json();
-    if (data.length > 0) {
-        const latest = data[data.length - 1];
-        document.getElementById('pitDuration').textContent = latest.pit_duration ? latest.pit_duration.toFixed(2) : 'N/A';
-    }
-}
+    if (stintData.length > 0 && lapData.length > 0) {
+        const latestStint = stintData[stintData.length - 1];
+        const currentLap = lapData[lapData.length - 1].lap_number;
 
-// 6. Radio
-async function fetchRadio() {
-    const res = await fetch(`https://api.openf1.org/v1/team_radio?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
-    const data = await res.json();
-    if (data.length > 0) {
-        const latest = data[data.length - 1];
-        const audio = latest.audio || 'No recent radio';
-        document.getElementById('radioMessage').textContent = audio;
+        document.getElementById('tyreCompound').textContent = latestStint.compound;
+
+        const stintLaps = (currentLap - latestStint.lap_start + latestStint.tyre_age_at_start);
+        document.getElementById('stintLength').textContent = stintLaps;
+    } else {
+        document.getElementById('tyreCompound').textContent = 'N/A';
+        document.getElementById('stintLength').textContent = 'N/A';
     }
 }
 
