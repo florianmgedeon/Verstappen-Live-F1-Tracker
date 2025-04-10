@@ -1,26 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verstappen Live Tracker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verstappen Live F1 GP Tracker</title>
+  <style>
+    :root {
+      --bg: #0e0f12;
+      --card-bg: #111215;
+      --border: #2b2d31;
+      --text: #ffffff;
+      --label: #6c7380;
+      --accent: #ff4d4d;
+      --font: 'Helvetica Neue', 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      margin: 0;
+      padding: 2.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    h2 {
+      font-size: 1rem;
+      color: #4c8bfd;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      margin-bottom: 2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      width: 100%;
+      max-width: 820px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 1.2rem 1rem;
+      text-align: center;
+    }
+
+    .label {
+      font-size: 0.75rem;
+      color: var(--label);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.3rem;
+    }
+
+    .value {
+      font-size: 1.8rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .value.red {
+      color: var(--accent);
+    }
+
+    .unit {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--label);
+      margin-left: 2px;
+    }
+
+    #lastRefresh {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--label);
+    }
+
+    @media (max-width: 700px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>Verstappen Live F1 GP Tracker</h1>
+  <h1>Verstappen</h1>
+  <h2>LIVE F1 GP TRACKER</h2>
 
-    <p>Current Position: <span id="currentPosition">Loading...</span></p>
-    <p>Gap to Leader: <span id="gapToLeader">Loading...</span> s</p>
-    <p>Interval to Car Ahead: <span id="intervalToAhead">Loading...</span> s</p>
+  <div class="grid">
+    <div class="card">
+      <div class="label">Current Position</div>
+      <div class="value" id="currentPosition">1</div>
+    </div>
+    <div class="card">
+      <div class="label">Gap to Leader</div>
+      <div class="value" id="gapToLeader">0.0<span class="unit">s</span></div>
+    </div>
+    <div class="card">
+      <div class="label">Interval to Car Ahead</div>
+      <div class="value" id="intervalToAhead">0.0<span class="unit">s</span></div>
+    </div>
+    <div class="card">
+      <div class="label">Last Lap Time</div>
+      <div class="value" id="lapTime">1:17.708</div>
+    </div>
+    <div class="card">
+      <div class="label">Lap Delta</div>
+      <div class="value red" id="lapDelta">+0.097<span class="unit">s</span></div>
+    </div>
+    <div class="card">
+      <div class="label">Tyre Compound</div>
+      <div class="value" id="tyreCompound">SOFT</div>
+    </div>
+    <div class="card" style="grid-column: span 3;">
+      <div class="label">Stint Laps</div>
+      <div class="value" id="stintLength">15</div>
+    </div>
+  </div>
 
+  <p id="lastRefresh">Last refresh: 4s ago</p>
 
-    <p>Last Lap Time: <span id="lapTime">Loading...</span> s</p>
-    <p>Lap Delta: <span id="lapDelta">Loading...</span></p>
+  <script>
+    // Example script to dynamically update last refresh timestamp
+    function updateRefreshTime() {
+      const now = new Date();
+      document.getElementById("lastRefresh").textContent = `Last refresh: ${now.toLocaleTimeString()}`;
+    }
 
-    <p>Tyre Compound: <span id="tyreCompound">Loading...</span></p>
-    <p>Stint Laps: <span id="stintLength">Loading...</span></p>
-
-    <p id="lastRefresh">Last refresh: loading...</p>
-
-    <script src="script.js"></script>
+    updateRefreshTime(); // Initial call
+    setInterval(updateRefreshTime, 5000); // Update every 5 seconds
+  </script>
 </body>
 </html>
