@@ -1,5 +1,7 @@
 const verstappenNumber = 1; // Max Verstappen's driver number
-const sessionKey = '7953'; // Use 'latest' for the most recent session
+const sessionKey = '9102'; // Use 'latest' for the most recent session
+
+let lastUpdated = null;
 
 async function fetchAllData() {
     try {
@@ -7,7 +9,8 @@ async function fetchAllData() {
             fetchGap(),
             fetchPosition(),
             fetchLapTimes(),
-            fetchTyres()
+            fetchTyres(),
+            lastUpdated = new Date()
         ]);
     } catch (err) {
         console.error('Error fetching F1 data:', err);
@@ -42,27 +45,46 @@ async function fetchPosition() {
 }
 
 // 3. Lap times
+function formatLapTime(seconds) {
+    if (typeof seconds !== 'number') return 'N/A';
+    const minutes = Math.floor(seconds / 60);
+    const secs = (seconds % 60).toFixed(3).padStart(6, '0');
+    return `${minutes}:${secs}`;
+}
+
 async function fetchLapTimes() {
     const res = await fetch(`https://api.openf1.org/v1/laps?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
     const data = await res.json();
-    const len = data.length;
 
+    const len = data.length;
     if (len >= 2) {
         const latest = data[len - 1];
         const previous = data[len - 2];
-        
-        document.getElementById('lapTime').textContent = latest.lap_duration?.toFixed(3) ?? 'N/A';
-        document.getElementById('prevLapTime').textContent = previous.lap_duration?.toFixed(3) ?? 'N/A';
-        
-        document.getElementById('sector1').textContent = latest.duration_sector_1?.toFixed(3) ?? 'N/A';
-        document.getElementById('sector2').textContent = latest.duration_sector_2?.toFixed(3) ?? 'N/A';
-        document.getElementById('sector3').textContent = latest.duration_sector_3?.toFixed(3) ?? 'N/A';
-        
+
+        const latestLapTime = latest.lap_duration;
+        const previousLapTime = previous.lap_duration;
+
+        // Show latest lap time
+        document.getElementById('lapTime').textContent = formatLapTime(latestLapTime);
+
+        // Show lap delta
+        if (latestLapTime != null && previousLapTime != null) {
+            const delta = latestLapTime - previousLapTime;
+            const deltaFormatted = `${delta >= 0 ? '+' : '−'}${Math.abs(delta).toFixed(3)} s`;
+
+            const deltaElement = document.getElementById('lapDelta');
+            deltaElement.textContent = deltaFormatted;
+            deltaElement.style.color = delta < 0 ? 'green' : (delta > 0 ? 'red' : 'black');
+        } else {
+            document.getElementById('lapDelta').textContent = 'N/A';
+        }
+
     } else {
-        document.getElementById('lapTime').textContent = 'Not yet';
-        document.getElementById('prevLapTime').textContent = 'Not yet';
+        document.getElementById('lapTime').textContent = formatLapTime(latestLapTime);
+        document.getElementById('lapDelta').textContent = 'N/A';
     }
 }
+
 
 // 4. Tyres / stints
 async function fetchTyres() {
@@ -84,6 +106,15 @@ async function fetchTyres() {
         document.getElementById('stintLength').textContent = 'N/A';
     }
 }
+
+function updateRefreshTimer() {
+    if (!lastUpdated) return;
+    const now = new Date();
+    const secondsAgo = Math.floor((now - lastUpdated) / 1000);
+    document.getElementById('lastRefresh').textContent = `Last refresh: ${secondsAgo}s ago`;
+}
+
+setInterval(updateRefreshTimer, 500);
 
 // Fetch data initially and then every 5 seconds
 fetchAllData();
