@@ -1,4 +1,3 @@
-# verstappentrackerf1
-Live data tracking of Max Verstappen's F1 GP races.
+## Verstappen-Live-F1-Tracker
 
-View my site [here](https://florianmgedeon.github.io/verstappentrackerf1/).
+Live data tracking of Max Verstappen's F1 racing activities. Best run with VS Code Live Server.
