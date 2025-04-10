@@ -1,32 +1,98 @@
-// Ersetzen Sie die URL durch Ihren tatsächlichen API-Endpunkt
-//const apiUrl = 'https://api.openf1.org/v1/car_data?driver_number=55&session_key=9159&date>'; //TEST
-const apiUrl = 'https://api.openf1.org/v1/car_data?driver_number=1&session_key=latest&date>'; //LIVE
+const verstappenNumber = 1; // Max Verstappen's driver number
+const sessionKey = '7953'; // Use 'latest' for the most recent session
 
-//let lastQueryTime = new Date('2023-09-15T14:07:53.774000+00:00'); // Startzeitpunkt TEST
-let lastQueryTime = new Date(); // Setzt lastQueryTime auf die aktuelle Zeit LIVE
-
-function fetchData() {
-    // Formatieren Sie das Datum in ISO 8601 Format und fügen Sie es zur URL hinzu
-    const url = `${apiUrl}${lastQueryTime.toISOString()}Z`;
-
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Keine Daten für diesen Zeitstempel gefunden');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const speed = data[0].speed;
-            // Überprüfen Sie, ob die Geschwindigkeit nicht null oder undefiniert ist, bevor Sie die Anzeige aktualisieren
-            if (speed != null) {
-                console.log(`Speed: ${speed} km/h`);
-                updateSpeed(speed);
-            }
-            // Aktualisieren Sie lastQueryTime mit dem neuesten Datum aus den Daten
-            lastQueryTime = new Date(data[data.length - 1].date);
-        })
-        .catch(error => {
-            console.error('Fehler beim Abrufen der Daten:', error);
-        });
+async function fetchAllData() {
+    try {
+        await Promise.all([
+            fetchGap(),
+            fetchPosition(),
+            fetchLapTimes(),
+            fetchTyres(),
+            fetchPitStop(),
+            fetchRadio()
+        ]);
+    } catch (err) {
+        console.error('Error fetching F1 data:', err);
+    }
 }
+
+// 1. Gap to leader & interval
+async function fetchGap() {
+    const res = await fetch(`https://api.openf1.org/v1/intervals?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+    const data = await res.json();
+    if (data.length > 0) {
+        const latest = data[data.length - 1];
+        document.getElementById('gapToLeader').textContent = latest.gap_to_leader?.toFixed(1) ?? 'N/A';
+        document.getElementById('intervalToAhead').textContent = latest.interval_to_car_ahead?.toFixed(1) ?? 'N/A';
+    }
+}
+
+// 2. Position
+async function fetchPosition() {
+    const res = await fetch(`https://api.openf1.org/v1/position?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+    const data = await res.json();
+    if (data.length > 0) {
+        const latest = data[data.length - 1];
+        document.getElementById('currentPosition').textContent = latest.position || 'N/A';
+    }
+}
+
+// 3. Lap times
+async function fetchLapTimes() {
+    const res = await fetch(`https://api.openf1.org/v1/laps?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+    const data = await res.json();
+    const len = data.length;
+
+    if (len >= 2) {
+        const latest = data[len - 1];
+        const previous = data[len - 2];
+        
+        document.getElementById('lapTime').textContent = latest.lap_duration?.toFixed(3) ?? 'N/A';
+        document.getElementById('prevLapTime').textContent = previous.lap_duration?.toFixed(3) ?? 'N/A';
+        
+        document.getElementById('sector1').textContent = latest.duration_sector_1?.toFixed(3) ?? 'N/A';
+        document.getElementById('sector2').textContent = latest.duration_sector_2?.toFixed(3) ?? 'N/A';
+        document.getElementById('sector3').textContent = latest.duration_sector_3?.toFixed(3) ?? 'N/A';
+        
+    } else {
+        document.getElementById('lapTime').textContent = 'Not yet';
+        document.getElementById('prevLapTime').textContent = 'Not yet';
+    }
+}
+
+
+// 4. Tyres / stints
+async function fetchTyres() {
+    const res = await fetch(`https://api.openf1.org/v1/stints?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+    const data = await res.json();
+    if (data.length > 0) {
+        const latest = data[data.length - 1];
+        document.getElementById('tyreCompound').textContent = latest.compound || 'N/A';
+        document.getElementById('stintLength').textContent = latest.laps_completed || 'N/A';
+    }
+}
+
+// 5. Pit stops
+async function fetchPitStop() {
+    const res = await fetch(`https://api.openf1.org/v1/pit?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+    const data = await res.json();
+    if (data.length > 0) {
+        const latest = data[data.length - 1];
+        document.getElementById('pitDuration').textContent = latest.pit_duration ? latest.pit_duration.toFixed(2) : 'N/A';
+    }
+}
+
+// 6. Radio
+async function fetchRadio() {
+    const res = await fetch(`https://api.openf1.org/v1/team_radio?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+    const data = await res.json();
+    if (data.length > 0) {
+        const latest = data[data.length - 1];
+        const audio = latest.audio || 'No recent radio';
+        document.getElementById('radioMessage').textContent = audio;
+    }
+}
+
+// Fetch data initially and then every 5 seconds
+fetchAllData();
+setInterval(fetchAllData, 5000);
