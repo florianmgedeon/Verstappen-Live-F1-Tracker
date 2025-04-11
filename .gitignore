@@ -1,0 +1,6 @@
+# 1 not full page refresh, just update numbers individually timed (depending on how often posted on average or fewer if less significant)
+# 2 optimize api calls size, more filtering
+# location, brake, drs, gear, rpm, speed, throttle
+# lap running timer, added to last 3, deltas, current and last lap sector colors
+script2.js
+index2.html

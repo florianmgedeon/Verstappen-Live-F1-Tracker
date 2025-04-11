@@ -4,7 +4,7 @@ const sessionKey = '9159'; // Use 'latest' for the most recent session
 let lastUpdated = null;
 
 // Monkey patch for testing ---------------------------------
-const useMockData = false;
+const useMockData = true;
 
 if (useMockData) {
   const originalFetch = window.fetch;
@@ -127,12 +127,12 @@ async function fetchTyres() {
   }
 }
 
-// function updateRefreshTimer() {
-//   if (!lastUpdated) return;
-//   const now = new Date();
-//   const secondsAgo = Math.floor((now - lastUpdated) / 1000);
-//   document.getElementById('lastRefresh').textContent = `Last refresh: ${secondsAgo}s ago`;
-// }
+function updateRefreshTimer() {
+  if (!lastUpdated) return;
+  const now = new Date();
+  const secondsAgo = Math.floor((now - lastUpdated) / 1000);
+  document.getElementById('lastRefresh').textContent = `Last refresh: ${secondsAgo}s ago`;
+}
 
 setInterval(updateRefreshTimer, 500);
 

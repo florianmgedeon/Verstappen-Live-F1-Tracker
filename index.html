@@ -140,15 +140,5 @@
   <!-- Load main dashboard logic -->
   <script src="script.js"></script>
   
-  <!-- Optional: inline fallback/backup -->
-  <script>
-    function updateRefreshTime() {
-      const now = new Date();
-      document.getElementById("lastRefresh").textContent = `Last refresh: ${now.toLocaleTimeString()}`;
-    }
-  
-    updateRefreshTime();
-    setInterval(updateRefreshTime, 5000);
-  </script>
   </body>
   </html>  
