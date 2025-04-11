@@ -24,20 +24,6 @@ if (useMockData) {
 }
 // -----------------------------------------------------------
 
-async function fetchAllData() {
-  try {
-    await Promise.all([
-      fetchGap(),
-      fetchPosition(),
-      fetchLapTimes(),
-      fetchTyres(),
-      lastUpdated = new Date()
-    ]);
-  } catch (err) {
-    console.error('Error fetching F1 data:', err);
-  }
-}
-
 // 1. Gap to leader & interval
 async function fetchGap() {
   const res = await fetch(`https://api.openf1.org/v1/intervals?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
@@ -85,17 +71,15 @@ async function fetchLapTimes() {
     const latestLapTime = latest.lap_duration;
     const previousLapTime = previous.lap_duration;
 
-    // Show latest lap time
     document.getElementById('lapTime').textContent = formatLapTime(latestLapTime);
 
-    // Show lap delta
     if (latestLapTime != null && previousLapTime != null) {
       const delta = latestLapTime - previousLapTime;
       const deltaFormatted = `${delta >= 0 ? '+' : '−'}${Math.abs(delta).toFixed(3)} s`;
 
       const deltaElement = document.getElementById('lapDelta');
       deltaElement.textContent = deltaFormatted;
-      deltaElement.style.color = delta < 0 ? 'green' : (delta > 0 ? 'red' : 'black');
+      deltaElement.style.color = delta < 0 ? 'green' : (delta > 0 ? 'red' : 'white');
     } else {
       document.getElementById('lapDelta').textContent = 'N/A';
     }
@@ -127,15 +111,15 @@ async function fetchTyres() {
   }
 }
 
-function updateRefreshTimer() {
-  if (!lastUpdated) return;
-  const now = new Date();
-  const secondsAgo = Math.floor((now - lastUpdated) / 1000);
-  document.getElementById('lastRefresh').textContent = `Last refresh: ${secondsAgo}s ago`;
-}
+// ✅ Initial fetch once
+fetchGap();
+fetchPosition();
+fetchLapTimes();
+fetchTyres();
+lastUpdated = new Date();
 
-setInterval(updateRefreshTimer, 500);
-
-// Fetch data initially and then every 5 seconds
-fetchAllData();
-setInterval(fetchAllData, 5000);
+// ✅ Individual polling intervals
+setInterval(fetchGap, 6000);  
+setInterval(fetchPosition, 6000);
+setInterval(fetchLapTimes, 6000);
+setInterval(fetchTyres, 6000);
