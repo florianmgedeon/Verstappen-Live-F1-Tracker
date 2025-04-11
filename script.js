@@ -1,59 +1,57 @@
-const verstappenNumber = 1; // Max Verstappen's driver number
-const sessionKey = '9159'; // Use 'latest' for the most recent session
 
-let lastUpdated = null;
+const verstappenNumber = 1;
+const sessionKey = '9159';
 
-// Monkey patch for testing ---------------------------------
 const useMockData = true;
 
 if (useMockData) {
   const originalFetch = window.fetch;
   window.fetch = async (url, options) => {
-    console.log("🔁 Intercepted fetch:", url);
-
-    const base = url.split('?')[0]; // Strip query for consistent match
+    const base = url.split('?')[0];
     const cacheBust = `?t=${Date.now()}`;
-
     if (base.includes("intervals")) return originalFetch("mock-data/intervals.json" + cacheBust);
     if (base.includes("position")) return originalFetch("mock-data/position.json" + cacheBust);
     if (base.includes("laps")) return originalFetch("mock-data/laps.json" + cacheBust);
     if (base.includes("stints")) return originalFetch("mock-data/stints.json" + cacheBust);
-
-    return originalFetch(url, options);
+    throw new Error("Unmocked fetch call attempted: " + url);
   };
 }
-// -----------------------------------------------------------
 
-// 1. Gap to leader & interval
+function animateValue(id, newValue) {
+  const el = document.getElementById(id);
+  if (!el || el.innerText === newValue) return;
+
+  // Wait briefly, then apply both value and animation together
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      el.innerText = newValue;
+      el.classList.add("glow");
+      setTimeout(() => el.classList.remove("glow"), 300);
+    }, 50);
+  });
+}
+
 async function fetchGap() {
   const res = await fetch(`https://api.openf1.org/v1/intervals?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
   const data = await res.json();
   if (data.length > 0) {
     const latest = data[data.length - 1];
-    const gap = latest.gap_to_leader === null ? 0 : latest.gap_to_leader;
-    const interval = latest.interval === null ? 0 : latest.interval;
-
-    document.getElementById('gapToLeader').textContent = gap.toFixed(1);
-    document.getElementById('intervalToAhead').textContent = interval.toFixed(1);
-  } else {
-    document.getElementById('gapToLeader').textContent = 'N/A';
-    document.getElementById('intervalToAhead').textContent = 'N/A';
+    if (latest.gap_to_leader != null) animateValue('gapToLeader', latest.gap_to_leader.toFixed(1));
+    if (latest.interval != null) animateValue('intervalToAhead', latest.interval.toFixed(1));
   }
 }
 
-// 2. Position
 async function fetchPosition() {
   const res = await fetch(`https://api.openf1.org/v1/position?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
   const data = await res.json();
   if (data.length > 0) {
     const latest = data[data.length - 1];
-    document.getElementById('currentPosition').textContent = latest.position || 'N/A';
+    if (latest.position != null) animateValue('currentPosition', latest.position.toString());
   }
 }
 
-// 3. Lap times
 function formatLapTime(seconds) {
-  if (typeof seconds !== 'number') return 'N/A';
+  if (typeof seconds !== 'number') return null;
   const minutes = Math.floor(seconds / 60);
   const secs = (seconds % 60).toFixed(3).padStart(6, '0');
   return `${minutes}:${secs}`;
@@ -68,29 +66,27 @@ async function fetchLapTimes() {
     const latest = data[len - 1];
     const previous = data[len - 2];
 
-    const latestLapTime = latest.lap_duration;
-    const previousLapTime = previous.lap_duration;
+    const formatted = formatLapTime(latest.lap_duration);
+    if (formatted) document.getElementById('lapTime').textContent = formatted;
 
-    document.getElementById('lapTime').textContent = formatLapTime(latestLapTime);
-
-    if (latestLapTime != null && previousLapTime != null) {
-      const delta = latestLapTime - previousLapTime;
+    if (latest.lap_duration != null && previous.lap_duration != null) {
+      const delta = latest.lap_duration - previous.lap_duration;
       const deltaFormatted = `${delta >= 0 ? '+' : '−'}${Math.abs(delta).toFixed(3)} s`;
-
-      const deltaElement = document.getElementById('lapDelta');
-      deltaElement.textContent = deltaFormatted;
-      deltaElement.style.color = delta < 0 ? 'green' : (delta > 0 ? 'red' : 'white');
-    } else {
-      document.getElementById('lapDelta').textContent = 'N/A';
+      const el = document.getElementById('lapDelta');
+      if (el.innerText !== deltaFormatted) {
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            el.innerText = deltaFormatted;
+            el.classList.add("glow");
+            setTimeout(() => el.classList.remove("glow"), 300);
+          }, 50);
+        });
+        el.style.color = delta < 0 ? 'green' : (delta > 0 ? 'red' : 'white');
+      }
     }
-
-  } else {
-    document.getElementById('lapTime').textContent = 'N/A';
-    document.getElementById('lapDelta').textContent = 'N/A';
   }
 }
 
-// 4. Tyres / stints
 async function fetchTyres() {
   const resStints = await fetch(`https://api.openf1.org/v1/stints?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
   const stintData = await resStints.json();
@@ -101,25 +97,19 @@ async function fetchTyres() {
     const latestStint = stintData[stintData.length - 1];
     const currentLap = lapData[lapData.length - 1].lap_number;
 
-    document.getElementById('tyreCompound').textContent = latestStint.compound;
+    if (latestStint.compound) animateValue('tyreCompound', latestStint.compound);
 
-    const stintLaps = (currentLap - latestStint.lap_start + latestStint.tyre_age_at_start);
-    document.getElementById('stintLength').textContent = stintLaps;
-  } else {
-    document.getElementById('tyreCompound').textContent = 'N/A';
-    document.getElementById('stintLength').textContent = 'N/A';
+    const stintLaps = currentLap - latestStint.lap_start + latestStint.tyre_age_at_start;
+    animateValue('stintLength', stintLaps.toString());
   }
 }
 
-// ✅ Initial fetch once
 fetchGap();
 fetchPosition();
 fetchLapTimes();
 fetchTyres();
-lastUpdated = new Date();
 
-// ✅ Individual polling intervals
-setInterval(fetchGap, 6000);  
+setInterval(fetchGap, 6000);
 setInterval(fetchPosition, 6000);
 setInterval(fetchLapTimes, 6000);
 setInterval(fetchTyres, 6000);

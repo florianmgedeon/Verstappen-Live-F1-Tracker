@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,10 +69,15 @@
       font-size: 1.8rem;
       font-weight: 600;
       line-height: 1.2;
+      transition: filter 0.3s ease, color 0.3s ease;
     }
 
     .value.red {
       color: var(--accent);
+    }
+
+    .value.glow {
+      filter: brightness(1.7);
     }
 
     .unit {
@@ -79,12 +85,6 @@
       font-weight: 400;
       color: var(--label);
       margin-left: 2px;
-    }
-
-    #lastRefresh {
-      margin-top: 2rem;
-      font-size: 0.85rem;
-      color: var(--label);
     }
 
     @media (max-width: 700px) {
@@ -111,11 +111,11 @@
     </div>
     <div class="card">
       <div class="label">Gap to Leader</div>
-      <div class="value" id="gapToLeader">0.0<span class="unit">s</span></div>
+      <div class="value"><span id="gapToLeader">0.0</span><span class="unit">s</span></div>
     </div>
     <div class="card">
       <div class="label">Interval to Car Ahead</div>
-      <div class="value" id="intervalToAhead">0.0<span class="unit">s</span></div>
+      <div class="value"><span id="intervalToAhead">0.0</span><span class="unit">s</span></div>
     </div>
     <div class="card">
       <div class="label">Last Lap Time</div>
@@ -123,7 +123,7 @@
     </div>
     <div class="card">
       <div class="label">Lap Delta</div>
-      <div class="value red" id="lapDelta">+0.097<span class="unit">s</span></div>
+      <div class="value red"><span id="lapDelta">+0.097</span><span class="unit"></span></div>
     </div>
     <div class="card">
       <div class="label">Stint Laps</div>
@@ -135,8 +135,6 @@
     </div>
   </div>  
 
-  <!-- Load main dashboard logic -->
   <script src="script.js"></script>
-  
-  </body>
-  </html>  
+</body>
+</html>
