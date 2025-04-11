@@ -2,7 +2,7 @@
 const verstappenNumber = 1;
 const sessionKey = '9159';
 
-const useMockData = true;
+const useMockData = false;
 
 if (useMockData) {
   const originalFetch = window.fetch;
@@ -31,8 +31,14 @@ function animateValue(id, newValue) {
   });
 }
 
+function getISOTimeSecondsAgo(seconds) {
+  const d = new Date(Date.now() - seconds * 1000);
+  return d.toISOString();
+}
+
 async function fetchGap() {
-  const res = await fetch(`https://api.openf1.org/v1/intervals?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+  const since = getISOTimeSecondsAgo(10);
+  const res = await fetch(`https://api.openf1.org/v1/intervals?driver_number=${verstappenNumber}&session_key=${sessionKey}&date>${since}`);
   const data = await res.json();
   if (data.length > 0) {
     const latest = data[data.length - 1];
