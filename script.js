@@ -1,5 +1,5 @@
 const verstappenNumber = 1; // Max Verstappen's driver number
-const sessionKey = '9102'; // Use 'latest' for the most recent session
+const sessionKey = '9159'; // Use 'latest' for the most recent session
 
 let lastUpdated = null;
 
@@ -127,12 +127,12 @@ async function fetchTyres() {
   }
 }
 
-function updateRefreshTimer() {
-  if (!lastUpdated) return;
-  const now = new Date();
-  const secondsAgo = Math.floor((now - lastUpdated) / 1000);
-  document.getElementById('lastRefresh').textContent = `Last refresh: ${secondsAgo}s ago`;
-}
+// function updateRefreshTimer() {
+//   if (!lastUpdated) return;
+//   const now = new Date();
+//   const secondsAgo = Math.floor((now - lastUpdated) / 1000);
+//   document.getElementById('lastRefresh').textContent = `Last refresh: ${secondsAgo}s ago`;
+// }
 
 setInterval(updateRefreshTimer, 500);
 
