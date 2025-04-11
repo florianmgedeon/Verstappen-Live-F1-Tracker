@@ -13,6 +13,7 @@ if (useMockData) {
     if (base.includes("position")) return originalFetch("mock-data/position.json" + cacheBust);
     if (base.includes("laps")) return originalFetch("mock-data/laps.json" + cacheBust);
     if (base.includes("stints")) return originalFetch("mock-data/stints.json" + cacheBust);
+    if (base.includes("car_data")) return originalFetch("mock-data/car_data.json" + cacheBust);
     throw new Error("Unmocked fetch call attempted: " + url);
   };
 }
@@ -38,7 +39,11 @@ function getISOTimeSecondsAgo(seconds) {
 
 async function fetchGap() {
   const since = getISOTimeSecondsAgo(10);
+  if (!useMockData) {
   const res = await fetch(`https://api.openf1.org/v1/intervals?driver_number=${verstappenNumber}&session_key=${sessionKey}&date>${since}`);
+  } else {
+    const res = await fetch(`https://api.openf1.org/v1/intervals?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+  }
   const data = await res.json();
   if (data.length > 0) {
     const latest = data[data.length - 1];
@@ -110,12 +115,30 @@ async function fetchTyres() {
   }
 }
 
+async function fetchCarData() {
+  const since = getISOTimeSecondsAgo(5);
+  if (!useMockData) {
+  const res = await fetch(`https://api.openf1.org/v1/car_data?driver_number=${verstappenNumber}&session_key=${sessionKey}&date>${since}`);
+  } else {
+    const res = await fetch(`https://api.openf1.org/v1/car_data?driver_number=${verstappenNumber}&session_key=${sessionKey}`);
+  }
+  const data = await res.json();
+  if (data.length === 0) return;
+
+  const latest = data[data.length - 1];
+  if (latest.throttle != null) animateValue("throttle", latest.throttle.toString());
+  if (latest.brake != null) animateValue("brake", latest.brake.toString());
+  if (latest.n_gear != null) animateValue("gear", latest.n_gear.toString());
+}
+
 fetchGap();
 fetchPosition();
 fetchLapTimes();
 fetchTyres();
+fetchCarData();
 
 setInterval(fetchGap, 6000);
 setInterval(fetchPosition, 6000);
 setInterval(fetchLapTimes, 6000);
 setInterval(fetchTyres, 6000);
+setInterval(fetchCarData, 1000);

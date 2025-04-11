@@ -1,8 +1,6 @@
 [
-  { "lap_number": 1, "lap_duration": 97.8356 },
-  { "lap_number": 2, "lap_duration": 97.0216 },
-  { "lap_number": 3, "lap_duration": 95.0667 },
-  { "lap_number": 4, "lap_duration": 98.2269 },
-  { "lap_number": 5, "lap_duration": 95.384 },
-  { "lap_number": 6, "lap_duration": 96.5444 }
+  { "lap_number": 1, "lap_duration": 95.4804 },
+  { "lap_number": 2, "lap_duration": 95.4915 },
+  { "lap_number": 3, "lap_duration": 96.11 },
+  { "lap_number": 4, "lap_duration": 98.7036 }
 ]

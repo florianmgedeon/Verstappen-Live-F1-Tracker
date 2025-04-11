@@ -1,8 +1,6 @@
 [
-  { "gap_to_leader": 3.54446, "interval": 0.708893 },
-  { "gap_to_leader": 2.52704, "interval": 0.505407 },
-  { "gap_to_leader": 0.0833853, "interval": 0.0166771 },
-  { "gap_to_leader": 4.03358, "interval": 0.806716 },
-  { "gap_to_leader": 0.480049, "interval": 0.0960099 },
-  { "gap_to_leader": 1.93052, "interval": 0.386104 }
+  { "gap_to_leader": 0.600448, "interval": 0.12009 },
+  { "gap_to_leader": 1.31684, "interval": 0.122886 },
+  { "gap_to_leader": 1.38755, "interval": 0.277509 },
+  { "gap_to_leader": 4.62951, "interval": 0.925902 }
 ]
