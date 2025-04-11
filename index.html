@@ -137,15 +137,18 @@
 
   <p id="lastRefresh">Last refresh: 4s ago</p>
 
+  <!-- Load main dashboard logic -->
+  <script src="script.js"></script>
+  
+  <!-- Optional: inline fallback/backup -->
   <script>
-    // Example script to dynamically update last refresh timestamp
     function updateRefreshTime() {
       const now = new Date();
       document.getElementById("lastRefresh").textContent = `Last refresh: ${now.toLocaleTimeString()}`;
     }
-
-    updateRefreshTime(); // Initial call
-    setInterval(updateRefreshTime, 5000); // Update every 5 seconds
+  
+    updateRefreshTime();
+    setInterval(updateRefreshTime, 5000);
   </script>
-</body>
-</html>
+  </body>
+  </html>  
